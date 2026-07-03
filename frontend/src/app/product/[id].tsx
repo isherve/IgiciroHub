@@ -1,0 +1,99 @@
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+
+import { apiError } from '@/api/api';
+import { ChatApi, CropsApi } from '@/api/services';
+import { CropListing } from '@/api/types';
+import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Field } from '@/components/Field';
+import { Screen } from '@/components/Screen';
+import { useAuth } from '@/context/AuthContext';
+import { colors, font, spacing } from '@/theme';
+
+export default function ProductDetail() {
+  const { t } = useTranslation();
+  const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { user, isGuest } = useAuth();
+
+  const [listing, setListing] = useState<CropListing | null>(null);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    CropsApi.get(Number(id)).then(setListing).catch(() => setListing(null));
+  }, [id]);
+
+  const contact = async () => {
+    if (!listing) return;
+    if (!user || isGuest) {
+      router.push('/login');
+      return;
+    }
+    setSending(true);
+    setError('');
+    try {
+      const convo = await ChatApi.start(listing.cooperative, message || `Hello, I'm interested in your ${listing.coffee_type_display}.`);
+      router.push(`/chat/${convo.id}`);
+    } catch (e) {
+      setError(apiError(e));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  if (!listing) {
+    return (
+      <Screen>
+        <Text style={styles.muted}>{t('common.loading')}</Text>
+      </Screen>
+    );
+  }
+
+  const isOwner = user?.id === listing.cooperative_owner;
+
+  return (
+    <Screen>
+      <Card>
+        <Text style={styles.name}>{listing.coffee_type_display}</Text>
+        <Text style={styles.sub}>{listing.grade_display} · {listing.quantity_kg} kg available</Text>
+        <Text style={styles.price}>{Number(listing.price_per_kg).toLocaleString()} {listing.currency}{t('market.perKg')}</Text>
+        <View style={styles.divider} />
+        <Text style={styles.label}>Cooperative</Text>
+        <Text style={styles.value}>{listing.cooperative_name}</Text>
+        <Text style={styles.label}>Location</Text>
+        <Text style={styles.value}>{listing.location || '—'}</Text>
+        {listing.description ? (
+          <>
+            <Text style={styles.label}>Description</Text>
+            <Text style={styles.value}>{listing.description}</Text>
+          </>
+        ) : null}
+      </Card>
+
+      {!isOwner && (
+        <Card>
+          <Text style={styles.label}>{t('market.messageSeller')}</Text>
+          <Field placeholder={t('chat.typeMessage')} value={message} onChangeText={setMessage} multiline />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Button title={t('market.messageSeller')} onPress={contact} loading={sending} />
+        </Card>
+      )}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  name: { color: colors.text, fontSize: font.xxl, fontWeight: '800' },
+  sub: { color: colors.textMuted, fontSize: font.md },
+  price: { color: colors.accent, fontSize: font.xl, fontWeight: '800' },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.sm },
+  label: { color: colors.textMuted, fontSize: font.sm, fontWeight: '600', marginTop: spacing.xs },
+  value: { color: colors.text, fontSize: font.md },
+  muted: { color: colors.textMuted },
+  error: { color: colors.danger, fontSize: font.sm },
+});
