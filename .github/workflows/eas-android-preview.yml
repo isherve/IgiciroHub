@@ -1,0 +1,33 @@
+# Build an Android APK on Expo EAS (preview profile).
+# Setup: add EXPO_TOKEN secret at https://github.com/isherve/IgiciroHub/settings/secrets/actions
+# Get token: https://expo.dev/accounts/[account]/settings/access-tokens
+name: EAS Android Preview
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK (preview)
+        working-directory: frontend
+        run: eas build --platform android --profile preview --non-interactive

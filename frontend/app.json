@@ -7,15 +7,29 @@
     "icon": "./assets/images/icon.png",
     "scheme": "igicirohub",
     "userInterfaceStyle": "dark",
+    "privacy": "public",
+    "privacyPolicyUrl": "https://isherve.github.io/IgiciroHub/",
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "rw.igicirohub.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to photograph coffee plants for disease symptom guidance.",
+        "NSPhotoLibraryUsageDescription": "Used to upload coffee plant photos for AI analysis."
+      }
     },
     "android": {
       "package": "rw.igicirohub.app",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "CAMERA",
+        "READ_MEDIA_IMAGES"
+      ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#0B140F",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
