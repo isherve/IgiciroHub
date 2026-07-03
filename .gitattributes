@@ -1,0 +1,2 @@
+# Ensure shell scripts run on Render (Linux).
+*.sh text eol=lf
