@@ -1,0 +1,49 @@
+{
+  "farmgate": {
+    "RandomForest": {
+      "MAE": 95.042,
+      "RMSE": 120.55,
+      "MAPE_pct": 4.32,
+      "accuracy_rate": 95.68,
+      "cv_MAE": 114.394
+    },
+    "LinearRegression": {
+      "MAE": 75.747,
+      "RMSE": 92.591,
+      "MAPE_pct": 3.54,
+      "accuracy_rate": 96.46,
+      "cv_MAE": 4683774685.471
+    },
+    "GradientBoosting": {
+      "MAE": 91.052,
+      "RMSE": 111.431,
+      "MAPE_pct": 4.11,
+      "accuracy_rate": 95.89,
+      "cv_MAE": 161.592
+    }
+  },
+  "export": {
+    "RandomForest": {
+      "MAE": 0.254,
+      "RMSE": 0.32,
+      "MAPE_pct": 3.9,
+      "accuracy_rate": 96.1,
+      "cv_MAE": 0.569
+    },
+    "LinearRegression": {
+      "MAE": 0.195,
+      "RMSE": 0.246,
+      "MAPE_pct": 3.0,
+      "accuracy_rate": 97.0,
+      "cv_MAE": 107497967.301
+    },
+    "GradientBoosting": {
+      "MAE": 0.248,
+      "RMSE": 0.316,
+      "MAPE_pct": 3.74,
+      "accuracy_rate": 96.26,
+      "cv_MAE": 0.705
+    }
+  },
+  "note": "Chronological (time-series) split; RandomForest chosen for production."
+}

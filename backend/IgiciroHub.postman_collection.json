@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "IgiciroHub API",
+    "description": "AI-based coffee price prediction and cooperative market access. Set the `base_url` variable, then run 'Login (demo cooperative)' first to populate the JWT.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "access", "value": "" },
+    { "key": "refresh", "value": "" },
+    { "key": "prediction_id", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (buyer)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/register/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Sample Buyer\",\n  \"email\": \"sample.buyer@example.com\",\n  \"phone_number\": \"+250780000000\",\n  \"role\": \"buyer\",\n  \"password\": \"StrongPass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (demo cooperative)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const d = pm.response.json();",
+                  "if (d.access) pm.collectionVariables.set('access', d.access);",
+                  "if (d.refresh) pm.collectionVariables.set('refresh', d.refresh);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@igicirohub.rw\",\n  \"password\": \"Demo1234!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/auth/refresh/",
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh}}\"\n}" }
+          }
+        },
+        { "name": "Me", "request": { "method": "GET", "url": "{{base_url}}/api/auth/me/" } }
+      ]
+    },
+    {
+      "name": "Prices",
+      "item": [
+        { "name": "Trending", "request": { "method": "GET", "url": "{{base_url}}/api/prices/trending/" } },
+        { "name": "History", "request": { "method": "GET", "url": "{{base_url}}/api/prices/history/?coffee_type=red_bourbon&price_type=farmgate&months=12" } },
+        { "name": "Seasonal", "request": { "method": "GET", "url": "{{base_url}}/api/prices/seasonal/?coffee_type=red_bourbon&price_type=farmgate" } }
+      ]
+    },
+    {
+      "name": "Predictions",
+      "item": [
+        {
+          "name": "Predict",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const d = pm.response.json();",
+                  "if (d.id) pm.collectionVariables.set('prediction_id', d.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/predictions/predict/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coffee_type\": \"red_bourbon\",\n  \"price_type\": \"farmgate\",\n  \"historical_period\": 12,\n  \"prediction_horizon\": 30\n}"
+            }
+          }
+        },
+        { "name": "Feature importance", "request": { "method": "GET", "url": "{{base_url}}/api/predictions/feature-importance/" } },
+        { "name": "History", "request": { "method": "GET", "url": "{{base_url}}/api/predictions/history/" } }
+      ]
+    },
+    {
+      "name": "Marketplace",
+      "item": [
+        { "name": "List crops", "request": { "method": "GET", "url": "{{base_url}}/api/crops/?available=true" } },
+        { "name": "Cooperatives", "request": { "method": "GET", "url": "{{base_url}}/api/cooperatives/" } }
+      ]
+    },
+    {
+      "name": "Alerts & Notifications",
+      "item": [
+        {
+          "name": "Create alert",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/alerts/subscriptions/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coffee_type\": \"red_bourbon\",\n  \"price_type\": \"export\",\n  \"threshold\": 6.5,\n  \"direction\": \"above\"\n}"
+            }
+          }
+        },
+        { "name": "List alerts", "request": { "method": "GET", "url": "{{base_url}}/api/alerts/subscriptions/" } },
+        { "name": "Notifications", "request": { "method": "GET", "url": "{{base_url}}/api/alerts/notifications/" } }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        { "name": "Prediction PDF", "request": { "method": "GET", "url": "{{base_url}}/api/reports/prediction/{{prediction_id}}/" } }
+      ]
+    },
+    {
+      "name": "Assistant",
+      "item": [
+        {
+          "name": "Chat",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/api/assistant/chat/",
+            "body": { "mode": "raw", "raw": "{\n  \"message\": \"When should I sell my Red Bourbon?\"\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}

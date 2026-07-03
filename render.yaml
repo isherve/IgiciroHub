@@ -1,0 +1,45 @@
+# Render Blueprint for the IgiciroHub backend.
+# In the Render dashboard: New + > Blueprint, point it at this repo, and Render
+# will create the web service + PostgreSQL database from this file.
+services:
+  - type: web
+    name: igicirohub-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: "bash ./build.sh"
+    startCommand: "gunicorn igicirohub.wsgi:application"
+    healthCheckPath: /
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: igicirohub.settings.prod
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "localhost,127.0.0.1"
+      # Set this to your app's web/marketing origins if you use Expo web.
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://igicirohub.rw"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: igicirohub-db
+          property: connectionString
+      # Optional integrations — fill in via the Render dashboard (leave blank to disable):
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+
+databases:
+  - name: igicirohub-db
+    plan: free

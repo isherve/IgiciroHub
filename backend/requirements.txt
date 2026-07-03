@@ -1,0 +1,33 @@
+# Core
+Django==5.1.4
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+django-cors-headers==4.6.0
+django-environ==0.11.2
+drf-spectacular==0.28.0
+
+# Security / throttling
+django-ratelimit==4.1.0
+
+# ML / data
+scikit-learn==1.5.2
+pandas==2.2.3
+numpy==2.1.3
+joblib==1.4.2
+
+# Reports (PDF)
+reportlab==4.2.5
+matplotlib==3.9.2
+
+# Images (crop photos, disease detection)
+Pillow==11.0.0
+
+# Integrations (optional at runtime; guarded in code)
+google-generativeai==0.8.3
+africastalking==1.2.9
+
+# Server / deployment
+gunicorn==23.0.0
+whitenoise==6.8.2
+dj-database-url==2.3.0
+psycopg[binary]==3.2.3

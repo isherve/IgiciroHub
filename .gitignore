@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Django
+*.sqlite3
+*.sqlite3-journal
+/backend/media/
+/backend/staticfiles/
+.env
+
+# ML artifacts are committed intentionally (see backend/predictions/ml)
+# but scratch outputs are not:
+*.log
+
+# Node / Expo
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+npm-debug.*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
