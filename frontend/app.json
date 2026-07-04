@@ -8,7 +8,7 @@
     "scheme": "igicirohub",
     "userInterfaceStyle": "dark",
     "privacy": "public",
-    "privacyPolicyUrl": "https://isherve.github.io/IgiciroHub/",
+    "privacyPolicyUrl": "https://isherve.github.io/IgiciroHub/privacy/",
     "ios": {
       "icon": "./assets/expo.icon",
       "bundleIdentifier": "rw.igicirohub.app",
@@ -23,6 +23,10 @@
       "package": "rw.igicirohub.app",
       "versionCode": 1,
       "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
         "INTERNET",
         "ACCESS_NETWORK_STATE",
         "CAMERA",
@@ -53,6 +57,7 @@
       "expo-sharing"
     ],
     "experiments": {
+      "baseUrl": "/IgiciroHub",
       "typedRoutes": false,
       "reactCompiler": true
     },
@@ -62,6 +67,12 @@
         "projectId": "d39d62af-ba46-4e00-8db5-53347e6530df"
       }
     },
-    "owner": "isherve"
+    "owner": "isherve",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d39d62af-ba46-4e00-8db5-53347e6530df"
+    }
   }
 }
