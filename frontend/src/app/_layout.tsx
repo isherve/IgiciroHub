@@ -48,7 +48,7 @@ export default function RootLayout() {
             <Stack.Screen name="alerts" options={{ title: 'Price Alerts' }} />
             <Stack.Screen name="assistant" options={{ title: 'AI Assistant' }} />
             <Stack.Screen name="chat/index" options={{ title: 'Messages' }} />
-            <Stack.Screen name="chat/[id]" options={{ title: 'Conversation' }} />
+            <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="product/[id]" options={{ title: 'Product' }} />
           </Stack>
         </AuthProvider>

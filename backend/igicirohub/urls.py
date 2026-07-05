@@ -24,6 +24,7 @@ urlpatterns = [
     path("api/chat/", include("chat.urls")),
     path("api/predictions/", include("predictions.urls")),
     path("api/alerts/", include("alerts.urls")),
+    path("api/analytics/", include("reports.analytics_urls")),
     path("api/reports/", include("reports.urls")),
     path("api/assistant/", include("gemini_assistant.urls")),
     # Docs

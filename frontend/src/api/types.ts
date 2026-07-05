@@ -114,3 +114,56 @@ export interface Paginated<T> {
   previous: string | null;
   results: T[];
 }
+
+export interface AnalyticsOverview {
+  counts: {
+    cooperatives: number;
+    buyers: number;
+    listings: number;
+    total_listings: number;
+    price_records: number;
+    predictions: number;
+    predictions_this_week: number;
+    conversations: number;
+    messages: number;
+    active_alerts: number;
+    notifications: number;
+  };
+  market: {
+    avg_farmgate_rwf: number;
+    avg_export_usd: number;
+    trends: { up: number; down: number; stable: number };
+  };
+  marketplace: {
+    total_kg_available: number;
+    avg_price_per_kg: number;
+  };
+  by_variety: {
+    coffee_type: string;
+    label: string;
+    listings: number;
+    avg_listing_price: number;
+    avg_farmgate: number;
+    min_farmgate: number;
+    max_farmgate: number;
+  }[];
+  by_region: {
+    region: string;
+    cooperatives: number;
+    listings: number;
+  }[];
+  prediction_summary: {
+    avg_accuracy: number;
+    avg_change_pct: number;
+    rising: number;
+    falling: number;
+    stable: number;
+  };
+  recent_activity: {
+    type: 'prediction' | 'listing' | 'message';
+    title: string;
+    detail: string;
+    timestamp: string;
+  }[];
+  generated_at: string;
+}
