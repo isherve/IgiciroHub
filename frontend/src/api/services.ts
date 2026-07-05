@@ -1,5 +1,6 @@
 import { api } from './api';
 import {
+  AnalyticsOverview,
   CoffeePrice,
   Conversation,
   CropListing,
@@ -93,6 +94,11 @@ export const AlertsApi = {
   markAllRead: () => api.post('/alerts/notifications/mark-all-read/'),
   unreadCount: () =>
     api.get<{ unread: number }>('/alerts/notifications/unread-count/').then((r) => r.data),
+};
+
+// ---- Analytics -----------------------------------------------------------
+export const AnalyticsApi = {
+  overview: () => api.get<AnalyticsOverview>('/analytics/overview/').then((r) => r.data),
 };
 
 // ---- Assistant -----------------------------------------------------------

@@ -36,9 +36,19 @@ export default function ProductDetail() {
     }
     setSending(true);
     setError('');
+    const defaultMsg =
+      message.trim() ||
+      `Hello, I am interested in your ${listing.coffee_type_display} ${listing.grade_display} listed at ${Number(listing.price_per_kg).toLocaleString()} ${listing.currency}/kg. Is it still available? I would like to discuss quantity and delivery options.`;
     try {
-      const convo = await ChatApi.start(listing.cooperative, message || `Hello, I'm interested in your ${listing.coffee_type_display}.`);
-      router.push(`/chat/${convo.id}`);
+      const convo = await ChatApi.start(listing.cooperative, defaultMsg);
+      router.push({
+        pathname: `/chat/${convo.id}`,
+        params: {
+          seller: listing.cooperative_name,
+          about: `${listing.coffee_type_display} ${listing.grade_display}`.toUpperCase(),
+          price: `${Number(listing.price_per_kg).toLocaleString()} ${listing.currency}/kg`,
+        },
+      });
     } catch (e) {
       setError(apiError(e));
     } finally {

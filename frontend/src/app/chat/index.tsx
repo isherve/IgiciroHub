@@ -32,7 +32,12 @@ export default function ChatList() {
         items.map((c) => {
           const other = user?.role === 'cooperative' ? c.buyer_name : c.cooperative_name;
           return (
-            <Pressable key={c.id} onPress={() => router.push(`/chat/${c.id}`)}>
+            <Pressable key={c.id} onPress={() => router.push({
+              pathname: `/chat/${c.id}`,
+              params: {
+                seller: user?.role === 'cooperative' ? c.buyer_name : c.cooperative_name,
+              },
+            })}>
               <Card style={styles.row}>
                 <View style={styles.avatar}>
                   <Text style={styles.avatarText}>{other?.[0]?.toUpperCase() ?? '?'}</Text>
