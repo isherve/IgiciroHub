@@ -28,12 +28,16 @@ function AssistantScreen() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [geminiLive, setGeminiLive] = useState<boolean | null>(null);
+  const [mode, setMode] = useState<'gemini' | 'quota' | 'offline' | null>(null);
 
   useEffect(() => {
     AssistantApi.status()
-      .then((s) => setGeminiLive(s.configured))
-      .catch(() => setGeminiLive(false));
+      .then((s) => {
+        if (s.available) setMode('gemini');
+        else if (s.mode === 'quota') setMode('quota');
+        else setMode('offline');
+      })
+      .catch(() => setMode('offline'));
   }, []);
 
   const send = async () => {
@@ -44,6 +48,7 @@ function AssistantScreen() {
     setLoading(true);
     try {
       const r = await AssistantApi.chat(text, i18n.language);
+      if (r.source === 'gemini') setMode('gemini');
       setMessages((m) => [...m, { role: 'ai', text: r.reply }]);
     } catch (err) {
       setMessages((m) => [...m, { role: 'ai', text: apiError(err, t('common.error')) }]);
@@ -57,11 +62,24 @@ function AssistantScreen() {
       <CoffeeBackdrop />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.list}>
-          {geminiLive !== null && (
-            <View style={[styles.modeBadge, geminiLive ? styles.modeLive : styles.modeStub]}>
-              <Ionicons name={geminiLive ? 'sparkles' : 'leaf'} size={14} color={geminiLive ? colors.accent : colors.primary} />
+          {mode !== null && (
+            <View
+              style={[
+                styles.modeBadge,
+                mode === 'gemini' ? styles.modeLive : mode === 'quota' ? styles.modeQuota : styles.modeStub,
+              ]}
+            >
+              <Ionicons
+                name={mode === 'gemini' ? 'sparkles' : mode === 'quota' ? 'warning' : 'leaf'}
+                size={14}
+                color={mode === 'gemini' ? colors.accent : mode === 'quota' ? colors.warning : colors.primary}
+              />
               <Text style={styles.modeText}>
-                {geminiLive ? t('assistant.geminiLive') : t('assistant.geminiOffline')}
+                {mode === 'gemini'
+                  ? t('assistant.geminiLive')
+                  : mode === 'quota'
+                    ? t('assistant.geminiQuota')
+                    : t('assistant.geminiOffline')}
               </Text>
             </View>
           )}

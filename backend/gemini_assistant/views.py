@@ -49,4 +49,4 @@ class AssistantStatusView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        return Response({"configured": client.is_configured()})
+        return Response(client.get_status())

@@ -109,7 +109,26 @@ def stub_reply(message: str, locale: str = "en") -> str:
             f"On the marketplace:\n{market}\n\n"
             "Open the Market tab to browse, or AI Predict for price forecasts."
         )
-    if any(w in low for w in ("price", "cost", "trend", "forecast", "predict", "worth", "value", "coffe", "coffee")):
+    if any(w in low for w in ("price", "cost", "trend", "forecast", "predict", "worth", "value")):
+        if trends:
+            body = "\n".join(f"• {t}" for t in trends)
+            return f"Recent prices:\n{body}\n\nUse the AI Predict tab for a full forecast with confidence range."
+        return "Check the Prices and AI Predict tabs for current and forecast coffee prices."
+    if any(w in low for w in ("new coffee", "new crop", "harvest", "quality", "how is", "fresh", "season")):
+        season = "Main harvest (Mar–Jul)" if 3 <= __import__("datetime").date.today().month <= 7 else "Fly crop or off-season"
+        if trends:
+            body = "\n".join(f"• {t}" for t in trends[:3])
+            return (
+                f"Rwanda coffee season: {season}.\n\n"
+                f"Latest market prices:\n{body}\n\n"
+                "New crop quality depends on processing (washed/natural), altitude, and grade. "
+                "Browse the Market tab for fresh cooperative listings, or AI Predict for price outlook."
+            )
+        return (
+            f"Rwanda coffee season: {season}. Check the Market tab for new listings from cooperatives "
+            "and AI Predict for price trends."
+        )
+    if any(w in low for w in ("coffe", "coffee")):
         if trends:
             body = "\n".join(f"• {t}" for t in trends)
             return f"Recent prices:\n{body}\n\nUse the AI Predict tab for a full forecast with confidence range."
@@ -121,7 +140,6 @@ def stub_reply(message: str, locale: str = "en") -> str:
         )
 
     return (
-        "I can help with coffee varieties, prices, and the marketplace. "
-        "Try: 'What coffee types are available?' or 'What are current prices?' "
-        "For full AI answers, your admin can add GEMINI_API_KEY to the server .env file."
+        "I can help with coffee varieties, prices, harvest season, and the marketplace. "
+        "Try: 'What coffee types are available?' or 'How is the new coffee season?'"
     )
