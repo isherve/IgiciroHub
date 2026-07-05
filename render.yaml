@@ -42,7 +42,7 @@ services:
     rootDir: frontend
     plan: free
     buildCommand: "npm ci && npx expo export --platform web"
-    staticPublishPath: dist
+    staticPublishPath: frontend/dist
     routes:
       - type: rewrite
         source: /*
