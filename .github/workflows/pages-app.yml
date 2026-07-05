@@ -41,6 +41,7 @@ jobs:
           EXPO_PUBLIC_API_URL: https://igicirohub-api.onrender.com
           CI: "1"
         run: |
+          node -e "const fs=require('fs');const p='app.json';const j=JSON.parse(fs.readFileSync(p));j.expo.experiments=j.expo.experiments||{};j.expo.experiments.baseUrl='/IgiciroHub';fs.writeFileSync(p,JSON.stringify(j,null,2)+'\n');"
           npm ci
           npx expo export --platform web
 
