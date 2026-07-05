@@ -190,7 +190,7 @@ SPECTACULAR_SETTINGS = {
 # Integrations (read here so apps can import from settings)
 # ---------------------------------------------------------------------------
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
-GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-1.5-flash")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.0-flash")
 
 AT_USERNAME = env("AT_USERNAME", default="sandbox")
 AT_API_KEY = env("AT_API_KEY", default="")
@@ -203,7 +203,8 @@ PREDICTION_NOTIFY_THRESHOLD_PCT = 5.0
 LOGIN_MAX_ATTEMPTS = 5
 LOGIN_LOCKOUT_SECONDS = 15 * 60
 
-# Shared cache for login lockout across Gunicorn workers (database-backed).
+# Shared cache for login lockout across Gunicorn workers.
+# createcachetable runs in build.sh; if missing, login still works (no lockout).
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
