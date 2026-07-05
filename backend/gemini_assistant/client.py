@@ -26,16 +26,33 @@ DISEASE_PROMPT = (
     "certified diagnosis and they should consult a local agronomist."
 )
 
+# Tried in order when the configured model is unavailable.
+MODEL_FALLBACKS = (
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-latest",
+)
+
 
 def is_configured() -> bool:
     return bool(getattr(settings, "GEMINI_API_KEY", ""))
 
 
-def _model():
+def _models_to_try():
+    primary = getattr(settings, "GEMINI_MODEL", "") or MODEL_FALLBACKS[0]
+    seen = set()
+    for name in (primary, *MODEL_FALLBACKS):
+        if name and name not in seen:
+            seen.add(name)
+            yield name
+
+
+def _generate(model_name: str, content):
     import google.generativeai as genai
 
     genai.configure(api_key=settings.GEMINI_API_KEY)
-    return genai.GenerativeModel(settings.GEMINI_MODEL, system_instruction=SYSTEM_PROMPT)
+    model = genai.GenerativeModel(model_name, system_instruction=SYSTEM_PROMPT)
+    return model.generate_content(content)
 
 
 from .stub import stub_reply
@@ -44,13 +61,21 @@ from .stub import stub_reply
 def ask(message: str, locale: str = "en") -> dict:
     if not is_configured():
         return {"reply": stub_reply(message, locale), "source": "stub"}
-    try:
-        model = _model()
-        resp = model.generate_content(message)
-        return {"reply": resp.text, "source": "gemini"}
-    except Exception:  # noqa: BLE001
-        logger.exception("Gemini ask failed")
-        return {"reply": "The assistant is temporarily unavailable. Please try again later.", "source": "error"}
+    last_error = None
+    for model_name in _models_to_try():
+        try:
+            resp = _generate(model_name, message)
+            text = getattr(resp, "text", None) or str(resp)
+            return {"reply": text, "source": "gemini", "model": model_name}
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            logger.warning("Gemini model %s failed: %s", model_name, exc)
+    logger.exception("Gemini ask failed after all models: %s", last_error)
+    return {
+        "reply": stub_reply(message, locale),
+        "source": "stub",
+        "detail": "Gemini unavailable — showing offline answers.",
+    }
 
 
 def describe_disease(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
@@ -64,12 +89,15 @@ def describe_disease(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
             ),
             "source": "stub",
         }
-    try:
-        model = _model()
-        resp = model.generate_content(
-            [DISEASE_PROMPT, {"mime_type": mime_type, "data": image_bytes}]
-        )
-        return {"description": resp.text, "source": "gemini"}
-    except Exception:  # noqa: BLE001
-        logger.exception("Gemini disease detection failed")
-        return {"description": "Image analysis is temporarily unavailable.", "source": "error"}
+    content = [DISEASE_PROMPT, {"mime_type": mime_type, "data": image_bytes}]
+    last_error = None
+    for model_name in _models_to_try():
+        try:
+            resp = _generate(model_name, content)
+            text = getattr(resp, "text", None) or str(resp)
+            return {"description": text, "source": "gemini", "model": model_name}
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            logger.warning("Gemini disease model %s failed: %s", model_name, exc)
+    logger.exception("Gemini disease detection failed: %s", last_error)
+    return {"description": "Image analysis is temporarily unavailable.", "source": "error"}

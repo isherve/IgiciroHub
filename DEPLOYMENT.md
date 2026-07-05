@@ -26,10 +26,21 @@ WhiteNoise support). You just need to connect the repo.
    `https://igicirohub-api.onrender.com`. Open it — it should return
    `{"status": "ok"}`. Swagger is at `/api/docs/`.
 
+### Enable full Gemini AI assistant
+
+1. Get a **free API key** from [Google AI Studio](https://aistudio.google.com/apikey).
+2. Open the Render dashboard → **igicirohub-api** → **Environment**.
+3. Add or update:
+   - `GEMINI_API_KEY` = your key (starts with `AIza…`)
+   - `GEMINI_MODEL` = `gemini-2.0-flash` (already set in `render.yaml`)
+4. Click **Save Changes** — Render redeploys automatically (~3 min).
+5. Log in to the app, open **AI Assistant**, and ask a question. Replies show `source: gemini` when live.
+
+> Without `GEMINI_API_KEY`, the assistant still works using offline answers from your database (prices, listings).
+
 ### After the first deploy
 
-- (Optional) In the service's **Environment** tab, fill in `GEMINI_API_KEY`,
-  `AT_API_KEY`, and email vars to enable the AI assistant / SMS / email.
+- Fill in optional env vars in the **Environment** tab: `GEMINI_API_KEY`, `AT_API_KEY`, email settings.
 - Update `CORS_ALLOWED_ORIGINS` if you host an Expo web build anywhere.
 
 > **Note:** Render's free tier sleeps after inactivity, so the first request

@@ -64,7 +64,10 @@ class LoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         identifier = (request.data.get("email") or "").lower()
         key = _lockout_key(identifier)
-        attempts = cache.get(key, 0)
+        try:
+            attempts = cache.get(key, 0)
+        except Exception:  # noqa: BLE001 — cache table may be missing on first deploy
+            attempts = 0
 
         if attempts >= settings.LOGIN_MAX_ATTEMPTS:
             return Response(
@@ -75,9 +78,15 @@ class LoginView(TokenObtainPairView):
         response = super().post(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_200_OK:
-            cache.delete(key)
+            try:
+                cache.delete(key)
+            except Exception:  # noqa: BLE001
+                pass
         else:
-            cache.set(key, attempts + 1, timeout=settings.LOGIN_LOCKOUT_SECONDS)
+            try:
+                cache.set(key, attempts + 1, timeout=settings.LOGIN_LOCKOUT_SECONDS)
+            except Exception:  # noqa: BLE001
+                pass
         return response
 
 

@@ -117,7 +117,7 @@ export default {
     edit: 'Edit Profile',
     save: 'Save',
   },
-  assistant: { title: 'AI Assistant', placeholder: 'Ask about coffee farming or prices...', notConfigured: 'AI assistant not configured on server.' },
+  assistant: { title: 'AI Assistant', placeholder: 'Ask about coffee farming or prices...', notConfigured: 'AI assistant not configured on server.', geminiLive: 'Gemini AI · live', geminiOffline: 'Offline assistant · database answers' },
   offline: { banner: 'Offline — showing cached data from {{time}}' },
   common: { loading: 'Loading...', retry: 'Retry', cancel: 'Cancel', save: 'Save', error: 'Error', empty: 'Nothing here yet' },
 };

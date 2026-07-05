@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -28,6 +28,13 @@ function AssistantScreen() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [geminiLive, setGeminiLive] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    AssistantApi.status()
+      .then((s) => setGeminiLive(s.configured))
+      .catch(() => setGeminiLive(false));
+  }, []);
 
   const send = async () => {
     const text = input.trim();
@@ -50,6 +57,14 @@ function AssistantScreen() {
       <CoffeeBackdrop />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.list}>
+          {geminiLive !== null && (
+            <View style={[styles.modeBadge, geminiLive ? styles.modeLive : styles.modeStub]}>
+              <Ionicons name={geminiLive ? 'sparkles' : 'leaf'} size={14} color={geminiLive ? colors.accent : colors.primary} />
+              <Text style={styles.modeText}>
+                {geminiLive ? t('assistant.geminiLive') : t('assistant.geminiOffline')}
+              </Text>
+            </View>
+          )}
           {messages.map((m, i) => (
             <View key={i} style={[styles.bubble, m.role === 'user' ? styles.user : styles.ai]}>
               <Text style={[styles.text, m.role === 'user' && { color: colors.white }]}>{m.text}</Text>
@@ -73,6 +88,19 @@ function AssistantScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   list: { padding: spacing.lg, gap: spacing.sm },
+  modeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 6,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+  },
+  modeLive: { backgroundColor: 'rgba(249,115,22,0.12)', borderColor: colors.accent },
+  modeStub: { backgroundColor: 'rgba(31,174,75,0.12)', borderColor: colors.primary },
+  modeText: { color: colors.textMuted, fontSize: font.xs, fontWeight: '600' },
   bubble: { maxWidth: '85%', padding: spacing.md, borderRadius: radius.lg },
   user: { alignSelf: 'flex-end', backgroundColor: colors.primary },
   ai: { alignSelf: 'flex-start', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
