@@ -26,16 +26,60 @@ DISEASE_PROMPT = (
     "certified diagnosis and they should consult a local agronomist."
 )
 
-# Tried in order when the configured model is unavailable.
+# Prefer 1.5 Flash first — better free-tier availability for new Google AI Studio keys.
 MODEL_FALLBACKS = (
-    "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-latest",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
 )
 
 
 def is_configured() -> bool:
     return bool(getattr(settings, "GEMINI_API_KEY", ""))
+
+
+def get_status() -> dict:
+    """Report whether Gemini is configured and actually reachable."""
+    if not is_configured():
+        return {
+            "configured": False,
+            "available": False,
+            "mode": "offline",
+            "message": "No GEMINI_API_KEY on server — using database answers.",
+        }
+    last_error = ""
+    for model_name in _models_to_try():
+        try:
+            resp = _generate(model_name, "Reply with exactly: OK")
+            text = (getattr(resp, "text", None) or "").strip()
+            if text:
+                return {
+                    "configured": True,
+                    "available": True,
+                    "mode": "gemini",
+                    "model": model_name,
+                    "message": "Gemini AI is live.",
+                }
+        except Exception as exc:  # noqa: BLE001
+            last_error = str(exc)
+            logger.warning("Gemini status probe failed on %s: %s", model_name, exc)
+    low = last_error.lower()
+    if "quota" in low or "429" in low or "resource_exhausted" in low:
+        message = (
+            "Gemini key is set but Google free-tier quota is exhausted. "
+            "Enable billing in Google AI Studio or wait and retry. Using database answers."
+        )
+        mode = "quota"
+    else:
+        message = f"Gemini unavailable ({last_error[:120]}). Using database answers."
+        mode = "unavailable"
+    return {
+        "configured": True,
+        "available": False,
+        "mode": mode,
+        "message": message,
+    }
 
 
 def _models_to_try():

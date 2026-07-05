@@ -107,7 +107,12 @@ export const AssistantApi = {
     api
       .post<{ reply: string; source: string }>('/assistant/chat/', { message, locale })
       .then((r) => r.data),
-  status: () => api.get<{ configured: boolean }>('/assistant/status/').then((r) => r.data),
+  status: () =>
+    api
+      .get<{ configured: boolean; available: boolean; mode: string; message?: string; model?: string }>(
+        '/assistant/status/',
+      )
+      .then((r) => r.data),
 };
 
 export const COFFEE_TYPES = [
