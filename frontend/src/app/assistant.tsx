@@ -5,13 +5,23 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 
 import { apiError } from '@/api/api';
 import { AssistantApi } from '@/api/services';
+import { CoffeeBackdrop } from '@/components/CoffeeBackground';
 import { Field } from '@/components/Field';
+import { RequireAuth } from '@/components/RequireAuth';
 import { colors, font, radius, spacing } from '@/theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Msg = { role: 'user' | 'ai'; text: string };
 
 export default function Assistant() {
+  return (
+    <RequireAuth>
+      <AssistantScreen />
+    </RequireAuth>
+  );
+}
+
+function AssistantScreen() {
   const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<Msg[]>([
     { role: 'ai', text: 'Muraho! Ask me about coffee farming, quality, or prices.' },
@@ -37,6 +47,7 @@ export default function Assistant() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
+      <CoffeeBackdrop />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={styles.list}>
           {messages.map((m, i) => (

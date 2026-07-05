@@ -3,6 +3,8 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from accounts.permissions import IsBuyer
+
 from .models import Conversation, Message
 from .serializers import (
     ConversationSerializer,
@@ -28,6 +30,11 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """Start (or reuse) a conversation with a cooperative and post first message."""
+        if not IsBuyer().has_permission(request, self):
+            return Response(
+                {"detail": "Only buyer accounts can start marketplace conversations."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = StartConversationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         coop = serializer.validated_data["cooperative"]

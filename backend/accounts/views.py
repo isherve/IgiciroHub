@@ -20,6 +20,7 @@ from .serializers import (
     RegisterSerializer,
     UserSerializer,
 )
+from .token_utils import blacklist_user_tokens
 
 User = get_user_model()
 
@@ -117,11 +118,13 @@ class ChangePasswordView(APIView):
             return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(serializer.validated_data["new_password"])
         user.save()
+        blacklist_user_tokens(user)
         return Response({"detail": "Password updated."})
 
 
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "password_reset"
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
@@ -149,6 +152,7 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
+    throttle_scope = "password_reset"
 
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
@@ -164,4 +168,5 @@ class PasswordResetConfirmView(APIView):
 
         user.set_password(serializer.validated_data["new_password"])
         user.save()
+        blacklist_user_tokens(user)
         return Response({"detail": "Password has been reset."})

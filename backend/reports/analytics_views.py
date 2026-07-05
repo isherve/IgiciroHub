@@ -19,7 +19,8 @@ from prices.models import CoffeePrice
 class AnalyticsOverviewView(APIView):
     """GET /api/analytics/overview/ — platform-wide stats for dashboards."""
 
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_scope = "analytics"
 
     def get(self, request):
         now = timezone.now()
@@ -207,7 +208,7 @@ class AnalyticsOverviewView(APIView):
                 {
                     "type": "message",
                     "title": f"Chat · {coop_name}",
-                    "detail": msg.message[:80],
+                    "detail": "New marketplace message",
                     "timestamp": msg.interaction_date.isoformat(),
                 }
             )

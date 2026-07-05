@@ -14,6 +14,7 @@ import { Card } from '@/components/Card';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { PriceChart } from '@/components/PriceChart';
 import { PriceTypePicker } from '@/components/PriceTypePicker';
+import { RequireAuth } from '@/components/RequireAuth';
 import { Screen } from '@/components/Screen';
 import { Segmented } from '@/components/Segmented';
 import { API_BASE } from '@/config';
@@ -32,6 +33,14 @@ function currentSeason() {
 }
 
 export default function Predict() {
+  return (
+    <RequireAuth>
+      <PredictScreen />
+    </RequireAuth>
+  );
+}
+
+function PredictScreen() {
   const { t } = useTranslation();
   const router = useRouter();
 

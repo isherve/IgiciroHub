@@ -71,13 +71,13 @@ export default function Dashboard() {
 
   const load = useCallback(async () => {
     try {
-      const [tr, cr, ov] = await Promise.all([
-        PricesApi.trending(),
-        CropsApi.list({ available: 'true' }),
-        AnalyticsApi.overview(),
-      ]);
+      const [tr, cr] = await Promise.all([PricesApi.trending(), CropsApi.list({ available: 'true' })]);
       setTrending(tr);
       setListings(cr.results ?? []);
+      let ov: AnalyticsOverview | null = null;
+      if (user) {
+        ov = await AnalyticsApi.overview();
+      }
       setAnalytics(ov);
       setUsingCache(false);
       await cacheSet('dashboard', { trending: tr, listings: cr.results ?? [], analytics: ov });
@@ -95,7 +95,7 @@ export default function Dashboard() {
         setUsingCache(true);
       }
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     load();

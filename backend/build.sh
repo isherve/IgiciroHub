@@ -10,6 +10,9 @@ python manage.py collectstatic --no-input
 # Apply database migrations.
 python manage.py migrate
 
+# Cache table for login lockout (shared across workers).
+python manage.py createcachetable --no-input 2>/dev/null || true
+
 # Train the ML models if the pickles are missing (first deploy).
 if [ ! -f predictions/ml/model_farmgate.pkl ]; then
   python manage.py train_model --regenerate-data

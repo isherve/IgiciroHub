@@ -1,11 +1,12 @@
 from django.db.models import Avg, Max
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from accounts.permissions import IsCooperativeOrReadOnly
 
-from .constants import CoffeeType
+from .constants import CoffeeType, PriceType
 from .models import CoffeePrice
 from .serializers import CoffeePriceSerializer, TrendingPriceSerializer
 
@@ -36,7 +37,28 @@ class CoffeePriceViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         coop = getattr(self.request.user, "cooperative", None)
+        if not coop:
+            raise PermissionDenied("Only a cooperative account can add prices.")
+        if serializer.validated_data.get("price_type") == PriceType.EXPORT:
+            raise PermissionDenied("Export reference prices are managed globally.")
         serializer.save(cooperative=coop)
+
+    def _assert_owner(self, instance):
+        coop = getattr(self.request.user, "cooperative", None)
+        if not coop:
+            raise PermissionDenied("Only a cooperative account can manage prices.")
+        if instance.cooperative_id is None:
+            raise PermissionDenied("Global reference prices cannot be edited.")
+        if instance.cooperative_id != coop.id:
+            raise PermissionDenied("You can only manage your own cooperative's prices.")
+
+    def perform_update(self, serializer):
+        self._assert_owner(serializer.instance)
+        serializer.save()
+
+    def perform_destroy(self, instance):
+        self._assert_owner(instance)
+        instance.delete()
 
     @action(detail=False, methods=["get"])
     def history(self, request):
