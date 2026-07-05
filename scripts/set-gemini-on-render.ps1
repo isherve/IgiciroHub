@@ -39,5 +39,8 @@ Write-Host "Updating GEMINI_API_KEY on $ServiceName ($serviceId)..."
 $body = @{ value = $GeminiApiKey } | ConvertTo-Json
 Invoke-RestMethod -Method Put -Uri "https://api.render.com/v1/services/$serviceId/env-vars/GEMINI_API_KEY" -Headers $headers -Body $body | Out-Null
 
-Write-Host "Done. Render will redeploy igicirohub-api automatically."
+$modelBody = @{ value = "gemini-2.5-flash" } | ConvertTo-Json
+Invoke-RestMethod -Method Put -Uri "https://api.render.com/v1/services/$serviceId/env-vars/GEMINI_MODEL" -Headers $headers -Body $modelBody | Out-Null
+
+Write-Host "Updated GEMINI_API_KEY and GEMINI_MODEL=gemini-2.5-flash."
 Write-Host "Test: https://igicirohub-api.onrender.com/api/assistant/status/ (after login)"

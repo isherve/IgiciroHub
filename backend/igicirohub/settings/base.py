@@ -190,7 +190,7 @@ SPECTACULAR_SETTINGS = {
 # Integrations (read here so apps can import from settings)
 # ---------------------------------------------------------------------------
 GEMINI_API_KEY = env("GEMINI_API_KEY", default="")
-GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-1.5-flash")
+GEMINI_MODEL = env("GEMINI_MODEL", default="gemini-2.5-flash")
 
 AT_USERNAME = env("AT_USERNAME", default="sandbox")
 AT_API_KEY = env("AT_API_KEY", default="")
