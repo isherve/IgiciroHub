@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { apiError } from '@/api/api';
 import { AssistantApi } from '@/api/services';
 import { Field } from '@/components/Field';
 import { colors, font, radius, spacing } from '@/theme';
@@ -11,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 type Msg = { role: 'user' | 'ai'; text: string };
 
 export default function Assistant() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState<Msg[]>([
     { role: 'ai', text: 'Muraho! Ask me about coffee farming, quality, or prices.' },
   ]);
@@ -25,10 +26,10 @@ export default function Assistant() {
     setInput('');
     setLoading(true);
     try {
-      const r = await AssistantApi.chat(text);
+      const r = await AssistantApi.chat(text, i18n.language);
       setMessages((m) => [...m, { role: 'ai', text: r.reply }]);
-    } catch {
-      setMessages((m) => [...m, { role: 'ai', text: t('assistant.notConfigured') }]);
+    } catch (err) {
+      setMessages((m) => [...m, { role: 'ai', text: apiError(err, t('common.error')) }]);
     } finally {
       setLoading(false);
     }

@@ -103,8 +103,10 @@ export const AnalyticsApi = {
 
 // ---- Assistant -----------------------------------------------------------
 export const AssistantApi = {
-  chat: (message: string) =>
-    api.post<{ reply: string; source: string }>('/assistant/chat/', { message }).then((r) => r.data),
+  chat: (message: string, locale?: string) =>
+    api
+      .post<{ reply: string; source: string }>('/assistant/chat/', { message, locale })
+      .then((r) => r.data),
   status: () => api.get<{ configured: boolean }>('/assistant/status/').then((r) => r.data),
 };
 
