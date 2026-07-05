@@ -109,7 +109,7 @@ def stub_reply(message: str, locale: str = "en") -> str:
             f"On the marketplace:\n{market}\n\n"
             "Open the Market tab to browse, or AI Predict for price forecasts."
         )
-    if any(w in low for w in ("price", "cost", "trend", "forecast", "predict")):
+    if any(w in low for w in ("price", "cost", "trend", "forecast", "predict", "worth", "value", "coffe", "coffee")):
         if trends:
             body = "\n".join(f"• {t}" for t in trends)
             return f"Recent prices:\n{body}\n\nUse the AI Predict tab for a full forecast with confidence range."

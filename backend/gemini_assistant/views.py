@@ -7,13 +7,17 @@ from . import client
 
 
 class AssistantChatView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # Guest browse + demo accounts should get stub answers without logging in.
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         message = (request.data.get("message") or "").strip()
         if not message:
             return Response({"detail": "message is required"}, status=status.HTTP_400_BAD_REQUEST)
-        locale = getattr(request.user, "locale", "en")
+        if request.user.is_authenticated:
+            locale = getattr(request.user, "locale", "en")
+        else:
+            locale = (request.data.get("locale") or "en")[:5]
         return Response(client.ask(message, locale=locale))
 
 
@@ -30,7 +34,7 @@ class DiseaseDetectionView(APIView):
 
 
 class AssistantStatusView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         return Response({"configured": client.is_configured()})
