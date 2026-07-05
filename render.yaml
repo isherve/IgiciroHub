@@ -40,9 +40,8 @@ services:
     name: igicirohub-web
     runtime: static
     rootDir: frontend
-    plan: free
-    buildCommand: "npm ci && npx expo export --platform web"
-    staticPublishPath: frontend/dist
+    buildCommand: "bash ./render-build.sh"
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /*
