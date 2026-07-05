@@ -6,10 +6,19 @@ import { AlertsApi } from '@/api/services';
 import { Notification } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { RequireAuth } from '@/components/RequireAuth';
 import { Screen } from '@/components/Screen';
 import { colors, font, spacing } from '@/theme';
 
 export default function Notifications() {
+  return (
+    <RequireAuth>
+      <NotificationsScreen />
+    </RequireAuth>
+  );
+}
+
+function NotificationsScreen() {
   const { t } = useTranslation();
   const [items, setItems] = useState<Notification[]>([]);
 

@@ -1,4 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 const ACCESS = 'igh.access';
 const REFRESH = 'igh.refresh';
@@ -16,19 +18,38 @@ export type StoredUser = {
   notify_sms?: boolean;
 };
 
+async function setSecure(key: string, value: string) {
+  if (Platform.OS === 'web') {
+    await AsyncStorage.setItem(key, value);
+  } else {
+    await SecureStore.setItemAsync(key, value);
+  }
+}
+
+async function getSecure(key: string) {
+  if (Platform.OS === 'web') {
+    return AsyncStorage.getItem(key);
+  }
+  return SecureStore.getItemAsync(key);
+}
+
+async function removeSecure(key: string) {
+  if (Platform.OS === 'web') {
+    await AsyncStorage.removeItem(key);
+  } else {
+    await SecureStore.deleteItemAsync(key);
+  }
+}
+
 export async function saveSession(access: string, refresh: string, user: StoredUser) {
-  await AsyncStorage.multiSet([
-    [ACCESS, access],
-    [REFRESH, refresh],
-    [USER, JSON.stringify(user)],
-  ]);
+  await setSecure(ACCESS, access);
+  await setSecure(REFRESH, refresh);
+  await AsyncStorage.setItem(USER, JSON.stringify(user));
 }
 
 export async function saveTokens(access: string, refresh: string) {
-  await AsyncStorage.multiSet([
-    [ACCESS, access],
-    [REFRESH, refresh],
-  ]);
+  await setSecure(ACCESS, access);
+  await setSecure(REFRESH, refresh);
 }
 
 export async function saveUser(user: StoredUser) {
@@ -36,11 +57,11 @@ export async function saveUser(user: StoredUser) {
 }
 
 export async function getAccess() {
-  return AsyncStorage.getItem(ACCESS);
+  return getSecure(ACCESS);
 }
 
 export async function getRefresh() {
-  return AsyncStorage.getItem(REFRESH);
+  return getSecure(REFRESH);
 }
 
 export async function getStoredUser(): Promise<StoredUser | null> {
@@ -49,10 +70,10 @@ export async function getStoredUser(): Promise<StoredUser | null> {
 }
 
 export async function clearSession() {
-  await AsyncStorage.multiRemove([ACCESS, REFRESH, USER]);
+  await Promise.all([removeSecure(ACCESS), removeSecure(REFRESH), AsyncStorage.removeItem(USER)]);
 }
 
-// Generic cache helpers for offline mode.
+// Generic cache helpers for offline mode (non-sensitive).
 export async function cacheSet(key: string, value: unknown) {
   await AsyncStorage.setItem(`igh.cache.${key}`, JSON.stringify({ ts: Date.now(), value }));
 }

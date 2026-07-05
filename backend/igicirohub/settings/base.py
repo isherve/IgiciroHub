@@ -154,6 +154,9 @@ REST_FRAMEWORK = {
         "login": "10/min",
         "register": "5/min",
         "predict": "30/min",
+        "password_reset": "5/min",
+        "assistant": "20/min",
+        "analytics": "30/min",
     },
 }
 
@@ -199,3 +202,15 @@ PREDICTION_NOTIFY_THRESHOLD_PCT = 5.0
 # Login lockout policy (used by accounts).
 LOGIN_MAX_ATTEMPTS = 5
 LOGIN_LOCKOUT_SECONDS = 15 * 60
+
+# Shared cache for login lockout across Gunicorn workers (database-backed).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "igicirohub_cache_table",
+    }
+}
+
+# Upload limits (listing photos, disease detection).
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024

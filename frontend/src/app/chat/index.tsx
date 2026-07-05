@@ -6,11 +6,20 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChatApi } from '@/api/services';
 import { Conversation } from '@/api/types';
 import { Card } from '@/components/Card';
+import { RequireAuth } from '@/components/RequireAuth';
 import { Screen } from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
 import { colors, font, radius, spacing } from '@/theme';
 
 export default function ChatList() {
+  return (
+    <RequireAuth>
+      <ChatListScreen />
+    </RequireAuth>
+  );
+}
+
+function ChatListScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuth();

@@ -1,5 +1,7 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
+from .models import User
+
 
 class IsCooperative(BasePermission):
     message = "Only cooperative accounts may perform this action."
@@ -13,6 +15,17 @@ class IsBuyer(BasePermission):
 
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated and request.user.is_buyer)
+
+
+class IsAdmin(BasePermission):
+    message = "Admin access required."
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_staff or request.user.role == User.Role.ADMIN)
+        )
 
 
 class IsOwnerOrReadOnly(BasePermission):

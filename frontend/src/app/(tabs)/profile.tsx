@@ -37,12 +37,14 @@ export default function Profile() {
     AuthApi.updateMe({ [key]: value }).catch(() => {});
   };
 
-  const links = [
-    { label: t('notifications.title'), icon: 'notifications', route: '/notifications' },
-    { label: t('chat.title'), icon: 'chatbubbles', route: '/chat' },
-    { label: t('alerts.title'), icon: 'alarm', route: '/alerts' },
-    { label: t('assistant.title'), icon: 'sparkles', route: '/assistant' },
-  ] as const;
+  const links = user && !isGuest
+    ? ([
+        { label: t('notifications.title'), icon: 'notifications', route: '/notifications' },
+        { label: t('chat.title'), icon: 'chatbubbles', route: '/chat' },
+        { label: t('alerts.title'), icon: 'alarm', route: '/alerts' },
+        { label: t('assistant.title'), icon: 'sparkles', route: '/assistant' },
+      ] as const)
+    : [];
 
   return (
     <Screen>
@@ -77,6 +79,7 @@ export default function Profile() {
         </Card>
       )}
 
+      {links.length > 0 && (
       <Card style={{ gap: 0, paddingVertical: spacing.xs }}>
         {links.map((l) => (
           <Pressable key={l.label} style={styles.linkRow} onPress={() => router.push(l.route as any)}>
@@ -86,6 +89,7 @@ export default function Profile() {
           </Pressable>
         ))}
       </Card>
+      )}
 
       {user ? (
         <Button title={t('profile.logout')} variant="outline" onPress={() => { logout(); router.replace('/welcome'); }} />

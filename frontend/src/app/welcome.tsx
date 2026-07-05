@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/Button';
+import { CoffeeBackdrop } from '@/components/CoffeeBackground';
 import { useAuth } from '@/context/AuthContext';
 import { colors, font, radius, spacing } from '@/theme';
 
@@ -16,6 +17,7 @@ export default function Welcome() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <CoffeeBackdrop />
       <View style={styles.hero}>
         <View style={styles.logo}>
           <Ionicons name="cafe" size={54} color={colors.primary} />

@@ -9,11 +9,20 @@ import { PriceAlert } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
+import { RequireAuth } from '@/components/RequireAuth';
 import { Screen } from '@/components/Screen';
 import { Segmented } from '@/components/Segmented';
 import { colors, font, spacing } from '@/theme';
 
 export default function Alerts() {
+  return (
+    <RequireAuth>
+      <AlertsScreen />
+    </RequireAuth>
+  );
+}
+
+function AlertsScreen() {
   const { t } = useTranslation();
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [coffeeType, setCoffeeType] = useState('red_bourbon');

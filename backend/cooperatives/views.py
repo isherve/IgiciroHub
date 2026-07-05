@@ -1,6 +1,9 @@
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+
+from accounts.permissions import IsCooperative
 
 from .models import Cooperative
 from .serializers import CooperativeSerializer
@@ -16,9 +19,11 @@ class CooperativeViewSet(viewsets.ModelViewSet):
     serializer_class = CooperativeSerializer
 
     def get_permissions(self):
-        if self.action in ("list", "retrieve", "me"):
+        if self.action in ("list", "retrieve"):
             return [permissions.AllowAny()]
-        return [permissions.IsAuthenticated()]
+        if self.action == "me":
+            return [permissions.IsAuthenticated(), IsCooperative()]
+        return [permissions.IsAuthenticated(), IsCooperative()]
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -44,9 +49,11 @@ class CooperativeViewSet(viewsets.ModelViewSet):
         return Response(self.get_serializer(coop).data)
 
     def perform_update(self, serializer):
-        # Only the owner can update.
         if serializer.instance.owner != self.request.user:
-            from rest_framework.exceptions import PermissionDenied
-
             raise PermissionDenied("You can only edit your own cooperative profile.")
         serializer.save()
+
+    def perform_destroy(self, instance):
+        if instance.owner != self.request.user:
+            raise PermissionDenied("You can only delete your own cooperative profile.")
+        instance.delete()

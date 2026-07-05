@@ -95,7 +95,7 @@ class PredictionHistoryView(ListAPIView):
 
 
 @api_view(["GET"])
-@permission_classes([permissions.AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 def feature_importance(request):
     """GET /api/predictions/feature-importance/ — what drives the price."""
     if not FEATURE_IMPORTANCE_JSON.exists():

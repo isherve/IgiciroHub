@@ -16,10 +16,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChatApi } from '@/api/services';
 import { Conversation, Message } from '@/api/types';
+import { RequireAuth } from '@/components/RequireAuth';
 import { useAuth } from '@/context/AuthContext';
 import { colors, font, radius, spacing } from '@/theme';
 
 export default function ChatThread() {
+  return (
+    <RequireAuth>
+      <ChatThreadScreen />
+    </RequireAuth>
+  );
+}
+
+function ChatThreadScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id, seller, about, price } = useLocalSearchParams<{
