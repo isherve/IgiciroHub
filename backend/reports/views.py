@@ -3,6 +3,8 @@ from rest_framework import permissions
 from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
 
+from accounts.permissions import IsAdmin
+
 from predictions.models import PredictionResult
 
 from .pdf import build_prediction_pdf
@@ -18,7 +20,11 @@ class PredictionReportView(APIView):
         if not prediction:
             raise NotFound("Prediction not found.")
         # Users can only download their own predictions (admins any).
-        if prediction.requested_by_id and prediction.requested_by_id != request.user.id and not request.user.is_staff:
+        if (
+            prediction.requested_by_id
+            and prediction.requested_by_id != request.user.id
+            and not IsAdmin().has_permission(request, self)
+        ):
             raise NotFound("Prediction not found.")
 
         buf = build_prediction_pdf(prediction)

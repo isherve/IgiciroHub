@@ -9,8 +9,10 @@ import { CropListing } from '@/api/types';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
 import { Field } from '@/components/Field';
+import { GuestBanner } from '@/components/GuestBanner';
 import { Screen } from '@/components/Screen';
 import { useAuth } from '@/context/AuthContext';
+import { canOrderOrChat } from '@/lib/permissions';
 import { colors, font, spacing } from '@/theme';
 
 export default function ProductDetail() {
@@ -66,8 +68,11 @@ export default function ProductDetail() {
 
   const isOwner = user?.id === listing.cooperative_owner;
 
+  const canContact = canOrderOrChat(user, isGuest);
+
   return (
     <Screen>
+      {isGuest && <GuestBanner />}
       <Card>
         <Text style={styles.name}>{listing.coffee_type_display}</Text>
         <Text style={styles.sub}>{listing.grade_display} · {listing.quantity_kg} kg available</Text>
@@ -85,12 +90,20 @@ export default function ProductDetail() {
         ) : null}
       </Card>
 
-      {!isOwner && (
+      {!isOwner && canContact && (
         <Card>
           <Text style={styles.label}>{t('market.messageSeller')}</Text>
           <Field placeholder={t('chat.typeMessage')} value={message} onChangeText={setMessage} multiline />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Button title={t('market.messageSeller')} onPress={contact} loading={sending} />
+        </Card>
+      )}
+
+      {!isOwner && !canContact && (
+        <Card>
+          <Text style={styles.label}>{t('market.messageSeller')}</Text>
+          <Text style={styles.muted}>{t('guest.loginToOrder')}</Text>
+          <Button title={t('auth.login')} onPress={() => router.push('/login')} />
         </Card>
       )}
     </Screen>

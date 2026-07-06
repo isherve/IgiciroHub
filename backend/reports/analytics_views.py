@@ -12,6 +12,7 @@ from chat.models import Conversation, Message
 from cooperatives.models import Cooperative
 from crops.models import CropListing
 from predictions.models import PredictionResult
+from accounts.permissions import IsAdmin
 from prices.constants import CoffeeType, MarketTrend, PriceType
 from prices.models import CoffeePrice
 
@@ -19,7 +20,7 @@ from prices.models import CoffeePrice
 class AnalyticsOverviewView(APIView):
     """GET /api/analytics/overview/ — platform-wide stats for dashboards."""
 
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdmin]
     throttle_scope = "analytics"
 
     def get(self, request):

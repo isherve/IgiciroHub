@@ -5,10 +5,12 @@ import { setAuthFailureHandler } from '@/api/api';
 import {
   StoredUser,
   clearSession,
+  getGuestMode,
   getRefresh,
   getStoredUser,
   saveSession,
   saveUser,
+  setGuestMode,
 } from '@/lib/storage';
 
 type AuthState = {
@@ -18,7 +20,7 @@ type AuthState = {
   login: (email: string, password: string) => Promise<void>;
   register: (payload: Record<string, unknown>) => Promise<void>;
   logout: () => Promise<void>;
-  continueAsGuest: () => void;
+  continueAsGuest: () => Promise<void>;
   refreshUser: () => Promise<void>;
   setUserLocal: (u: StoredUser) => Promise<void>;
 };
@@ -40,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     await clearSession();
+    await setGuestMode(false);
     setUser(null);
     setIsGuest(false);
   }, []);
@@ -55,7 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       const stored = await getStoredUser();
-      if (stored) setUser(stored);
+      const guest = await getGuestMode();
+      if (stored) {
+        setUser(stored);
+        setIsGuest(false);
+      } else if (guest) {
+        setIsGuest(true);
+      }
       setLoading(false);
     })();
   }, []);
@@ -63,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const data = await AuthApi.login(email, password);
     await saveSession(data.access, data.refresh, data.user);
+    await setGuestMode(false);
     setUser(data.user);
     setIsGuest(false);
   }, []);
@@ -70,11 +80,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = useCallback(async (payload: Record<string, unknown>) => {
     const data = await AuthApi.register(payload);
     await saveSession(data.access, data.refresh, data.user);
+    await setGuestMode(false);
     setUser(data.user);
     setIsGuest(false);
   }, []);
 
-  const continueAsGuest = useCallback(() => {
+  const continueAsGuest = useCallback(async () => {
+    await clearSession();
+    await setGuestMode(true);
     setIsGuest(true);
     setUser(null);
   }, []);

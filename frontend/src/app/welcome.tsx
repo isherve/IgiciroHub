@@ -30,7 +30,7 @@ export default function Welcome() {
       <View style={styles.actions}>
         <Button title={t('welcome.joinCoop')} onPress={() => router.push('/register?role=cooperative')} />
         <Button title={t('welcome.signIn')} variant="outline" onPress={() => router.push('/login')} />
-        <Button title={t('auth.guest')} variant="ghost" onPress={() => { continueAsGuest(); router.replace('/(tabs)'); }} />
+        <Button title={t('auth.guest')} variant="ghost" onPress={async () => { await continueAsGuest(); router.replace('/(tabs)'); }} />
       </View>
     </SafeAreaView>
   );

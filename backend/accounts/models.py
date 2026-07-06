@@ -81,3 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_buyer(self):
         return self.role == self.Role.BUYER
+
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == self.Role.ADMIN

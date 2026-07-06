@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 
 from prices.constants import CoffeeType, PriceType
 
+from accounts.permissions import IsAdmin
+
 from .ml import predictor
 from .ml.config import FEATURE_IMPORTANCE_JSON
 from .ml.predictor import ModelNotTrained
@@ -95,7 +97,7 @@ class PredictionHistoryView(ListAPIView):
 
 
 @api_view(["GET"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAdmin])
 def feature_importance(request):
     """GET /api/predictions/feature-importance/ — what drives the price."""
     if not FEATURE_IMPORTANCE_JSON.exists():
