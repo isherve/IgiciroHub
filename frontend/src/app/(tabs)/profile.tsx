@@ -97,9 +97,9 @@ export default function Profile() {
       )}
 
       {user ? (
-        <Button title={t('profile.logout')} variant="outline" onPress={() => { logout(); router.replace('/welcome'); }} />
+        <Button title={t('profile.logout')} variant="outline" onPress={() => { logout(); router.replace('/'); }} />
       ) : (
-        <Button title={t('auth.login')} onPress={() => router.replace('/login')} />
+        <Button title={t('auth.login')} onPress={() => router.replace('/')} />
       )}
     </Screen>
   );

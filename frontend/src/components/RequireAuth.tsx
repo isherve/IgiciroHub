@@ -23,8 +23,8 @@ export function RequireAuth({ children, allowGuest = false }: Props) {
     );
   }
 
-  if (!user && !allowGuest) return <Redirect href="/login" />;
-  if (isGuest && !allowGuest) return <Redirect href="/login" />;
+  if (!user && !allowGuest) return <Redirect href="/" />;
+  if (isGuest && !allowGuest) return <Redirect href="/" />;
 
   return <>{children}</>;
 }
