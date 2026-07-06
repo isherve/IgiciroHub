@@ -9,6 +9,7 @@ import { colors } from '@/theme';
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { user, isGuest } = useAuth();
+  const guest = isGuest || !user;
 
   if (!user && !isGuest) return <Redirect href="/welcome" />;
 
@@ -33,7 +34,11 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="predict"
-        options={{ title: t('tabs.ai'), tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color} size={size} /> }}
+        options={{
+          href: guest ? null : undefined,
+          title: t('tabs.ai'),
+          tabBarIcon: ({ color, size }) => <Ionicons name="sparkles" color={color} size={size} />,
+        }}
       />
       <Tabs.Screen
         name="market"

@@ -117,6 +117,16 @@ export default {
     edit: 'Edit Profile',
     save: 'Save',
   },
+  guest: {
+    role: 'Guest · view only',
+    viewOnlyTitle: 'View-only mode',
+    viewOnlySub: 'Browse prices and marketplace. Sign in to predict, chat, or order.',
+    loginToOrder: 'Sign in as a buyer to message sellers and place orders.',
+  },
+  admin: {
+    title: 'Admin Overview',
+    subtitle: 'Platform-wide analytics and activity (admin only).',
+  },
   assistant: { title: 'AI Assistant', placeholder: 'Ask about coffee farming or prices...', notConfigured: 'AI assistant not configured on server.', geminiLive: 'Gemini AI · live', geminiOffline: 'Smart assistant · database answers', geminiQuota: 'Gemini key set · quota limited (using database)' },
   offline: { banner: 'Offline — showing cached data from {{time}}' },
   common: { loading: 'Loading...', retry: 'Retry', cancel: 'Cancel', save: 'Save', error: 'Error', empty: 'Nothing here yet' },

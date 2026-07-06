@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 const ACCESS = 'igh.access';
 const REFRESH = 'igh.refresh';
 const USER = 'igh.user';
+const GUEST = 'igh.guest';
 
 export type StoredUser = {
   id: number;
@@ -71,6 +72,15 @@ export async function getStoredUser(): Promise<StoredUser | null> {
 
 export async function clearSession() {
   await Promise.all([removeSecure(ACCESS), removeSecure(REFRESH), AsyncStorage.removeItem(USER)]);
+}
+
+export async function setGuestMode(on: boolean) {
+  if (on) await AsyncStorage.setItem(GUEST, '1');
+  else await AsyncStorage.removeItem(GUEST);
+}
+
+export async function getGuestMode(): Promise<boolean> {
+  return (await AsyncStorage.getItem(GUEST)) === '1';
 }
 
 // Generic cache helpers for offline mode (non-sensitive).

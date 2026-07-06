@@ -7,18 +7,25 @@ import { Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native'
 import { AnalyticsApi, CropsApi, PricesApi } from '@/api/services';
 import { AnalyticsOverview, CropListing, TrendingPrice } from '@/api/types';
 import { Card } from '@/components/Card';
+import { GuestBanner } from '@/components/GuestBanner';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { Screen } from '@/components/Screen';
 import { useOffline } from '@/components/useOffline';
 import { useAuth } from '@/context/AuthContext';
+import { isAdmin } from '@/lib/permissions';
 import { cacheGet, cacheSet } from '@/lib/storage';
 import { colors, font, radius, spacing } from '@/theme';
 
-const QUICK = [
+const QUICK_ALL = [
   { key: 'browse', icon: 'search', route: '/(tabs)/market', tone: 'green' },
   { key: 'prices', icon: 'stats-chart', route: '/(tabs)/prices', tone: 'orange' },
   { key: 'saved', icon: 'heart', route: '/notifications', tone: 'green' },
   { key: 'aiPredict', icon: 'sparkles', route: '/(tabs)/predict', tone: 'orange' },
+] as const;
+
+const QUICK_GUEST = [
+  { key: 'browse', icon: 'search', route: '/(tabs)/market', tone: 'green' },
+  { key: 'prices', icon: 'stats-chart', route: '/(tabs)/prices', tone: 'orange' },
 ] as const;
 
 function timeGreeting(t: (k: string) => string) {
@@ -75,7 +82,7 @@ export default function Dashboard() {
       setTrending(tr);
       setListings(cr.results ?? []);
       let ov: AnalyticsOverview | null = null;
-      if (user) {
+      if (user && isAdmin(user)) {
         ov = await AnalyticsApi.overview();
       }
       setAnalytics(ov);
@@ -119,19 +126,24 @@ export default function Dashboard() {
     return up + down + stable || 1;
   }, [analytics]);
 
+  const quickActions = isGuest ? QUICK_GUEST : QUICK_ALL;
+
   return (
     <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
       {(offline || usingCache) && <OfflineBanner timestamp={cachedAt} />}
+      {isGuest && <GuestBanner />}
 
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.greeting}>{timeGreeting(t)} 👋</Text>
           <Text style={styles.name}>{displayName}</Text>
         </View>
-        <Pressable onPress={() => router.push('/notifications')} style={styles.bell}>
-          <Ionicons name="notifications-outline" size={22} color={colors.text} />
-          <View style={styles.bellDot} />
-        </Pressable>
+        {!isGuest && user && (
+          <Pressable onPress={() => router.push('/notifications')} style={styles.bell}>
+            <Ionicons name="notifications-outline" size={22} color={colors.text} />
+            <View style={styles.bellDot} />
+          </Pressable>
+        )}
       </View>
 
       {analytics && (
@@ -263,7 +275,7 @@ export default function Dashboard() {
 
       <Text style={styles.section}>{t('dashboard.quickActions')}</Text>
       <View style={styles.quickRow}>
-        {QUICK.map((q) => {
+        {quickActions.map((q) => {
           const bg = q.tone === 'orange' ? colors.accent : colors.primary;
           return (
             <Pressable key={q.key} style={styles.quickItem} onPress={() => router.push(q.route as any)}>

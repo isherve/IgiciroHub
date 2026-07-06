@@ -66,7 +66,7 @@ export default function Login() {
         <View style={styles.divider} />
 
         <Button title={t('auth.demoLogin')} variant="accent" onPress={() => doLogin(DEMO.email, DEMO.password)} loading={loading} />
-        <Button title={t('auth.guest')} variant="ghost" onPress={() => { continueAsGuest(); router.replace('/(tabs)'); }} />
+        <Button title={t('auth.guest')} variant="ghost" onPress={async () => { await continueAsGuest(); router.replace('/(tabs)'); }} />
       </Screen>
     </KeyboardAvoidingView>
   );

@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   modeLive: { backgroundColor: 'rgba(249,115,22,0.12)', borderColor: colors.accent },
+  modeQuota: { backgroundColor: 'rgba(245,158,11,0.12)', borderColor: colors.warning },
   modeStub: { backgroundColor: 'rgba(31,174,75,0.12)', borderColor: colors.primary },
   modeText: { color: colors.textMuted, fontSize: font.xs, fontWeight: '600' },
   bubble: { maxWidth: '85%', padding: spacing.md, borderRadius: radius.lg },

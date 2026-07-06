@@ -29,6 +29,7 @@ User = get_user_model()
 
 DEMO_COOP_EMAIL = "demo@igicirohub.rw"
 DEMO_BUYER_EMAIL = "buyer@igicirohub.rw"
+DEMO_ADMIN_EMAIL = "admin@igicirohub.rw"
 DEMO_PASSWORD = "Demo1234!"
 
 EXTRA_COOPS = [
@@ -134,6 +135,24 @@ class Command(BaseCommand):
             buyer_user.save()
         self.stdout.write(f"Buyer user: {buyer_user.email} ({'created' if b_created else 'exists'})")
 
+        admin_user, a_created = User.objects.get_or_create(
+            email=DEMO_ADMIN_EMAIL,
+            defaults={
+                "full_name": "IgiciroHub Platform Admin",
+                "role": User.Role.ADMIN,
+                "is_staff": True,
+                "phone_number": "+250788000099",
+            },
+        )
+        if a_created:
+            admin_user.set_password(DEMO_PASSWORD)
+            admin_user.save()
+        elif not admin_user.is_staff or admin_user.role != User.Role.ADMIN:
+            admin_user.is_staff = True
+            admin_user.role = User.Role.ADMIN
+            admin_user.save(update_fields=["is_staff", "role"])
+        self.stdout.write(f"Admin user: {admin_user.email} ({'created' if a_created else 'exists'})")
+
         if not CoffeePrice.objects.exists():
             self._seed_global_prices(coop, months)
         else:
@@ -160,6 +179,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
         self.stdout.write(f"  Demo cooperative login: {DEMO_COOP_EMAIL} / {DEMO_PASSWORD}")
         self.stdout.write(f"  Demo buyer login:       {DEMO_BUYER_EMAIL} / {DEMO_PASSWORD}")
+        self.stdout.write(f"  Demo admin login:       {DEMO_ADMIN_EMAIL} / {DEMO_PASSWORD}")
 
     def _seed_global_prices(self, coop, months):
         df = ensure_dataset()

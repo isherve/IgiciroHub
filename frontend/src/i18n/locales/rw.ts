@@ -25,6 +25,13 @@ export default {
     haveAccount: 'Usanzwe ufite konti? Injira',
     registerAs: 'Iyandikishe nka',
   },
+  guest: {
+    role: "Umushyitsi · reba gusa",
+    viewOnlyTitle: 'Uburyo bwo kureba gusa',
+    viewOnlySub: 'Reba ibiciro n\'isoko. Injira kugira ngo utegure, uvugane, cyangwa ugure.',
+    loginToOrder: 'Injira nk\'umuguzi kugira ngo wandikire abacuruzi.',
+  },
+  admin: { title: 'Incamake y\'ubuyobozi', subtitle: 'Imibare y\'uburyo (admin gusa).' },
   dashboard: {
     greeting: 'Muraho',
     quickActions: 'Ibikorwa byihuse',

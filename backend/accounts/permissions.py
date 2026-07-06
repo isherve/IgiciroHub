@@ -41,7 +41,7 @@ class IsOwnerOrReadOnly(BasePermission):
 
 
 class IsCooperativeOrReadOnly(BasePermission):
-    """Read for anyone authenticated; write only for cooperatives."""
+    """Public read (guest browse); authenticated cooperative write only."""
 
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
@@ -51,3 +51,14 @@ class IsCooperativeOrReadOnly(BasePermission):
             and request.user.is_authenticated
             and request.user.is_cooperative
         )
+
+
+class IsAuthenticatedReadOnly(BasePermission):
+    """Authenticated users may read; writes are denied (view-only accounts)."""
+
+    message = "This account is view-only and cannot modify data."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        return request.method in SAFE_METHODS

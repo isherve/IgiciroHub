@@ -7,9 +7,11 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { AuthApi } from '@/api/services';
 import { Button } from '@/components/Button';
 import { Card } from '@/components/Card';
+import { GuestBanner } from '@/components/GuestBanner';
 import { Screen } from '@/components/Screen';
 import { Segmented } from '@/components/Segmented';
 import { useAuth } from '@/context/AuthContext';
+import { isAdmin } from '@/lib/permissions';
 import { LANGUAGES, setLanguage } from '@/i18n';
 import { colors, font, radius, spacing } from '@/theme';
 
@@ -39,6 +41,7 @@ export default function Profile() {
 
   const links = user && !isGuest
     ? ([
+        ...(isAdmin(user) ? [{ label: t('admin.title'), icon: 'shield-checkmark' as const, route: '/admin' }] : []),
         { label: t('notifications.title'), icon: 'notifications', route: '/notifications' },
         { label: t('chat.title'), icon: 'chatbubbles', route: '/chat' },
         { label: t('alerts.title'), icon: 'alarm', route: '/alerts' },
@@ -49,6 +52,7 @@ export default function Profile() {
   return (
     <Screen>
       <Text style={styles.title}>{t('profile.title')}</Text>
+      {isGuest && <GuestBanner />}
 
       <Card style={styles.userCard}>
         <View style={styles.avatar}>
@@ -57,7 +61,7 @@ export default function Profile() {
         <View style={{ flex: 1 }}>
           <Text style={styles.name}>{user?.full_name ?? 'Guest'}</Text>
           <Text style={styles.sub}>{user?.email ?? 'Browsing as guest'}</Text>
-          {user ? <Text style={styles.roleBadge}>{user.role}</Text> : null}
+          {user ? <Text style={styles.roleBadge}>{user.role}</Text> : isGuest ? <Text style={styles.roleBadge}>{t('guest.role')}</Text> : null}
         </View>
       </Card>
 
