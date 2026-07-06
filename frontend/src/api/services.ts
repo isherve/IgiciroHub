@@ -3,6 +3,7 @@ import {
   AnalyticsOverview,
   CoffeePrice,
   Conversation,
+  Cooperative,
   CropListing,
   Message,
   Notification,
@@ -56,15 +57,18 @@ export const CropsApi = {
   get: (id: number) => api.get<CropListing>(`/crops/${id}/`).then((r) => r.data),
   create: (payload: Record<string, unknown>) =>
     api.post<CropListing>('/crops/', payload).then((r) => r.data),
+  update: (id: number, payload: Record<string, unknown>) =>
+    api.patch<CropListing>(`/crops/${id}/`, payload).then((r) => r.data),
+  remove: (id: number) => api.delete(`/crops/${id}/`),
 };
 
 // ---- Cooperatives --------------------------------------------------------
 export const CoopApi = {
   list: (params?: Record<string, unknown>) =>
     api.get('/cooperatives/', { params }).then((r) => r.data),
-  me: () => api.get('/cooperatives/me/').then((r) => r.data),
+  me: () => api.get<Cooperative>('/cooperatives/me/').then((r) => r.data),
   updateMe: (payload: Record<string, unknown>) =>
-    api.patch('/cooperatives/me/', payload).then((r) => r.data),
+    api.patch<Cooperative>('/cooperatives/me/', payload).then((r) => r.data),
 };
 
 // ---- Chat ----------------------------------------------------------------
@@ -127,4 +131,11 @@ export const PRICE_TYPES = [
   { value: 'farmgate', label: 'Farm Gate' },
   { value: 'cooperative', label: 'Cooperative' },
   { value: 'export', label: 'Export (USD)' },
+];
+
+export const COFFEE_GRADES = [
+  { value: 'AA', label: 'Grade AA' },
+  { value: 'A', label: 'Grade A' },
+  { value: 'B', label: 'Grade B' },
+  { value: 'C', label: 'Grade C' },
 ];

@@ -11,7 +11,7 @@ import { GuestBanner } from '@/components/GuestBanner';
 import { Screen } from '@/components/Screen';
 import { Segmented } from '@/components/Segmented';
 import { useAuth } from '@/context/AuthContext';
-import { isAdmin } from '@/lib/permissions';
+import { isAdmin, isCooperative } from '@/lib/permissions';
 import { LANGUAGES, setLanguage } from '@/i18n';
 import { colors, font, radius, spacing } from '@/theme';
 
@@ -41,6 +41,7 @@ export default function Profile() {
 
   const links = user && !isGuest
     ? ([
+        ...(isCooperative(user) ? [{ label: t('cooperative.title'), icon: 'business' as const, route: '/cooperative' }] : []),
         ...(isAdmin(user) ? [{ label: t('admin.title'), icon: 'shield-checkmark' as const, route: '/admin' }] : []),
         { label: t('notifications.title'), icon: 'notifications', route: '/notifications' },
         { label: t('chat.title'), icon: 'chatbubbles', route: '/chat' },

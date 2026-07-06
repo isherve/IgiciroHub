@@ -48,6 +48,17 @@ export interface PredictionResult {
   recommendation: string;
 }
 
+export interface Cooperative {
+  id: number;
+  cooperative_name: string;
+  location: string;
+  contact_info: string;
+  description: string;
+  owner_name: string;
+  owner_email: string;
+  created_at: string;
+}
+
 export interface CropListing {
   id: number;
   cooperative: number;
