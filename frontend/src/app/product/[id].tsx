@@ -33,7 +33,7 @@ export default function ProductDetail() {
   const contact = async () => {
     if (!listing) return;
     if (!user || isGuest) {
-      router.push('/login');
+      router.push('/');
       return;
     }
     setSending(true);
@@ -103,7 +103,7 @@ export default function ProductDetail() {
         <Card>
           <Text style={styles.label}>{t('market.messageSeller')}</Text>
           <Text style={styles.muted}>{t('guest.loginToOrder')}</Text>
-          <Button title={t('auth.login')} onPress={() => router.push('/login')} />
+          <Button title={t('auth.login')} onPress={() => router.push('/')} />
         </Card>
       )}
     </Screen>

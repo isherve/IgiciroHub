@@ -1,11 +1,13 @@
-import { Redirect } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
+import { AuthLanding } from '@/components/AuthLanding';
 import { useAuth } from '@/context/AuthContext';
 import { colors } from '@/theme';
 
 export default function Index() {
+  const router = useRouter();
   const { user, isGuest, loading } = useAuth();
 
   if (loading) {
@@ -17,5 +19,6 @@ export default function Index() {
   }
 
   if (user || isGuest) return <Redirect href="/(tabs)" />;
-  return <Redirect href="/welcome" />;
+
+  return <AuthLanding onAuthed={() => router.replace('/(tabs)')} />;
 }

@@ -39,7 +39,7 @@ export default function ForgotPassword() {
       {message ? <Text style={styles.success}>{message}</Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button title="Send reset link" onPress={submit} loading={loading} />
-      <Button title="Back to login" variant="ghost" onPress={() => router.replace('/login')} />
+      <Button title="Back to login" variant="ghost" onPress={() => router.replace('/')} />
     </Screen>
   );
 }
