@@ -19,7 +19,22 @@ export type StoredUser = {
   notify_sms?: boolean;
 };
 
+function webSession(): Storage | null {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  return window.sessionStorage;
+}
+
+/** Web auth uses sessionStorage so each new visit starts at login. */
+function useWebSessionForAuth() {
+  return Platform.OS === 'web';
+}
+
 async function setSecure(key: string, value: string) {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    session.setItem(key, value);
+    return;
+  }
   if (Platform.OS === 'web') {
     await AsyncStorage.setItem(key, value);
   } else {
@@ -28,6 +43,10 @@ async function setSecure(key: string, value: string) {
 }
 
 async function getSecure(key: string) {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    return session.getItem(key);
+  }
   if (Platform.OS === 'web') {
     return AsyncStorage.getItem(key);
   }
@@ -35,6 +54,10 @@ async function getSecure(key: string) {
 }
 
 async function removeSecure(key: string) {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    session.removeItem(key);
+  }
   if (Platform.OS === 'web') {
     await AsyncStorage.removeItem(key);
   } else {
@@ -42,10 +65,46 @@ async function removeSecure(key: string) {
   }
 }
 
+async function setAuthFlag(key: string, value: string) {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    session.setItem(key, value);
+    return;
+  }
+  await AsyncStorage.setItem(key, value);
+}
+
+async function getAuthFlag(key: string): Promise<string | null> {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    return session.getItem(key);
+  }
+  return AsyncStorage.getItem(key);
+}
+
+async function removeAuthFlag(key: string) {
+  const session = webSession();
+  if (useWebSessionForAuth() && session) {
+    session.removeItem(key);
+  }
+  await AsyncStorage.removeItem(key);
+}
+
+/** Drop old localStorage sessions from before web used sessionStorage. */
+export async function clearLegacyWebAuth() {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+  const keys = [ACCESS, REFRESH, USER, GUEST];
+  keys.forEach((k) => {
+    window.localStorage.removeItem(k);
+    window.localStorage.removeItem(`@RNCAsyncStorage:${k}`);
+  });
+  await AsyncStorage.multiRemove(keys);
+}
+
 export async function saveSession(access: string, refresh: string, user: StoredUser) {
   await setSecure(ACCESS, access);
   await setSecure(REFRESH, refresh);
-  await AsyncStorage.setItem(USER, JSON.stringify(user));
+  await setAuthFlag(USER, JSON.stringify(user));
 }
 
 export async function saveTokens(access: string, refresh: string) {
@@ -54,7 +113,7 @@ export async function saveTokens(access: string, refresh: string) {
 }
 
 export async function saveUser(user: StoredUser) {
-  await AsyncStorage.setItem(USER, JSON.stringify(user));
+  await setAuthFlag(USER, JSON.stringify(user));
 }
 
 export async function getAccess() {
@@ -66,21 +125,21 @@ export async function getRefresh() {
 }
 
 export async function getStoredUser(): Promise<StoredUser | null> {
-  const raw = await AsyncStorage.getItem(USER);
+  const raw = await getAuthFlag(USER);
   return raw ? (JSON.parse(raw) as StoredUser) : null;
 }
 
 export async function clearSession() {
-  await Promise.all([removeSecure(ACCESS), removeSecure(REFRESH), AsyncStorage.removeItem(USER)]);
+  await Promise.all([removeSecure(ACCESS), removeSecure(REFRESH), removeAuthFlag(USER)]);
 }
 
 export async function setGuestMode(on: boolean) {
-  if (on) await AsyncStorage.setItem(GUEST, '1');
-  else await AsyncStorage.removeItem(GUEST);
+  if (on) await setAuthFlag(GUEST, '1');
+  else await removeAuthFlag(GUEST);
 }
 
 export async function getGuestMode(): Promise<boolean> {
-  return (await AsyncStorage.getItem(GUEST)) === '1';
+  return (await getAuthFlag(GUEST)) === '1';
 }
 
 // Generic cache helpers for offline mode (non-sensitive).

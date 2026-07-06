@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from '@/context/AuthContext';
+import { AuthGate } from '@/components/AuthGate';
 import '@/i18n';
 import { loadStoredLanguage } from '@/i18n';
 import { colors } from '@/theme';
@@ -29,6 +30,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
+          <AuthGate>
           <StatusBar style="light" />
           <Stack
             screenOptions={{
@@ -52,6 +54,7 @@ export default function RootLayout() {
             <Stack.Screen name="chat/[id]" options={{ headerShown: false }} />
             <Stack.Screen name="product/[id]" options={{ title: 'Product' }} />
           </Stack>
+          </AuthGate>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
