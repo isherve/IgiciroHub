@@ -12,7 +12,7 @@ import { OfflineBanner } from '@/components/OfflineBanner';
 import { Screen } from '@/components/Screen';
 import { useOffline } from '@/components/useOffline';
 import { useAuth } from '@/context/AuthContext';
-import { isAdmin } from '@/lib/permissions';
+import { isAdmin, isCooperative } from '@/lib/permissions';
 import { cacheGet, cacheSet } from '@/lib/storage';
 import { colors, font, radius, spacing } from '@/theme';
 
@@ -20,6 +20,13 @@ const QUICK_ALL = [
   { key: 'browse', icon: 'search', route: '/(tabs)/market', tone: 'green' },
   { key: 'prices', icon: 'stats-chart', route: '/(tabs)/prices', tone: 'orange' },
   { key: 'saved', icon: 'heart', route: '/notifications', tone: 'green' },
+  { key: 'aiPredict', icon: 'sparkles', route: '/(tabs)/predict', tone: 'orange' },
+] as const;
+
+const QUICK_COOP = [
+  { key: 'coopHub', icon: 'business', route: '/cooperative', tone: 'green' },
+  { key: 'browse', icon: 'search', route: '/(tabs)/market', tone: 'green' },
+  { key: 'prices', icon: 'stats-chart', route: '/(tabs)/prices', tone: 'orange' },
   { key: 'aiPredict', icon: 'sparkles', route: '/(tabs)/predict', tone: 'orange' },
 ] as const;
 
@@ -126,7 +133,11 @@ export default function Dashboard() {
     return up + down + stable || 1;
   }, [analytics]);
 
-  const quickActions = isGuest ? QUICK_GUEST : QUICK_ALL;
+  const quickActions = useMemo(() => {
+    if (isGuest) return QUICK_GUEST;
+    if (user && isCooperative(user)) return QUICK_COOP;
+    return QUICK_ALL;
+  }, [isGuest, user]);
 
   return (
     <Screen refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
