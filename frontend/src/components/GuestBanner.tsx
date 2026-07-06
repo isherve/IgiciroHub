@@ -18,7 +18,7 @@ export function GuestBanner() {
         <Text style={styles.title}>{t('guest.viewOnlyTitle')}</Text>
         <Text style={styles.sub}>{t('guest.viewOnlySub')}</Text>
       </View>
-      <Pressable style={styles.btn} onPress={() => router.push('/')}>
+      <Pressable style={styles.btn} onPress={() => router.push('/login')}>
         <Text style={styles.btnText}>{t('auth.login')}</Text>
       </Pressable>
     </View>

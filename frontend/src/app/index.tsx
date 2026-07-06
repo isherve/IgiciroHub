@@ -1,24 +1,7 @@
-import { Redirect, useRouter } from 'expo-router';
+import { Redirect } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, View } from 'react-native';
 
-import { AuthLanding } from '@/components/AuthLanding';
-import { useAuth } from '@/context/AuthContext';
-import { colors } from '@/theme';
-
+/** Root URL — send visitors to the login screen. */
 export default function Index() {
-  const router = useRouter();
-  const { user, isGuest, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={colors.primary} size="large" />
-      </View>
-    );
-  }
-
-  if (user || isGuest) return <Redirect href="/(tabs)" />;
-
-  return <AuthLanding onAuthed={() => router.replace('/(tabs)')} />;
+  return <Redirect href="/login" />;
 }
