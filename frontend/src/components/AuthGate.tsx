@@ -1,24 +1,30 @@
-import { useRouter, useSegments } from 'expo-router';
-import React, { useEffect } from 'react';
+import { useSegments } from 'expo-router';
+import React from 'react';
+import { ActivityIndicator, Redirect, View } from 'react-native';
 
 import { useAuth } from '@/context/AuthContext';
+import { colors } from '@/theme';
 
 const PUBLIC_SEGMENTS = new Set(['index', 'login', 'register', 'welcome', 'forgot-password']);
 
-/** Send unauthenticated users to /login before protected screens render. */
+/** Block protected routes until the user is signed in or browsing as guest. */
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, isGuest, loading } = useAuth();
   const segments = useSegments();
-  const router = useRouter();
+  const root = segments[0];
+  const isPublic = !root || PUBLIC_SEGMENTS.has(root);
 
-  useEffect(() => {
-    if (loading) return;
-    const root = segments[0];
-    if (!root || PUBLIC_SEGMENTS.has(root)) return;
-    if (!user && !isGuest) {
-      router.replace('/login');
-    }
-  }, [loading, user, isGuest, segments, router]);
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color={colors.primary} size="large" />
+      </View>
+    );
+  }
+
+  if (!isPublic && !user && !isGuest) {
+    return <Redirect href="/login" />;
+  }
 
   return <>{children}</>;
 }

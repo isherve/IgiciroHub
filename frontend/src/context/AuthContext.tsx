@@ -4,7 +4,6 @@ import { AuthApi } from '@/api/services';
 import { setAuthFailureHandler } from '@/api/api';
 import {
   StoredUser,
-  clearLegacyWebAuth,
   clearSession,
   getAccess,
   getGuestMode,
@@ -54,25 +53,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuthFailureHandler(() => {
       setUser(null);
       setIsGuest(false);
+      void setGuestMode(false);
     });
   }, []);
 
   useEffect(() => {
     (async () => {
-      await clearLegacyWebAuth();
-      const stored = await getStoredUser();
-      const access = await getAccess();
-      const guest = await getGuestMode();
-      if (stored && access) {
-        setUser(stored);
-        setIsGuest(false);
-      } else if (stored || access) {
-        await clearSession();
-        await setGuestMode(false);
-      } else if (guest) {
-        setIsGuest(true);
+      try {
+        const stored = await getStoredUser();
+        const access = await getAccess();
+        const guest = await getGuestMode();
+        if (stored && access) {
+          setUser(stored);
+          setIsGuest(false);
+        } else if (stored || access) {
+          await clearSession();
+          await setGuestMode(false);
+        } else if (guest) {
+          setIsGuest(true);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, []);
 
