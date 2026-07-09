@@ -8,7 +8,6 @@ import { colors } from '@/theme';
 
 /** App entry — login and register landing page. */
 export default function LoginScreen() {
-  const router = useRouter();
   const { user, isGuest, loading } = useAuth();
 
   if (loading) {
@@ -21,5 +20,5 @@ export default function LoginScreen() {
 
   if (user || isGuest) return <Redirect href="/(tabs)" />;
 
-  return <AuthLanding onAuthed={() => router.replace('/(tabs)')} />;
+  return <AuthLanding />;
 }

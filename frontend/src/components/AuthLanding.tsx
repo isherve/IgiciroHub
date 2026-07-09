@@ -16,11 +16,7 @@ const DEMO = { email: 'demo@igicirohub.rw', password: 'Demo1234!' };
 
 type AuthMode = 'login' | 'register';
 
-type Props = {
-  onAuthed: () => void;
-};
-
-export function AuthLanding({ onAuthed }: Props) {
+export function AuthLanding() {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useLocalSearchParams<{ auth?: string; role?: string }>();
@@ -46,7 +42,6 @@ export function AuthLanding({ onAuthed }: Props) {
     setLoading(true);
     try {
       await login(em, pw);
-      onAuthed();
     } catch (e) {
       setError(apiError(e, 'Login failed. Check your credentials.'));
     } finally {
@@ -80,7 +75,6 @@ export function AuthLanding({ onAuthed }: Props) {
         cooperative_name: coopName,
         business_name: businessName,
       });
-      onAuthed();
     } catch (err) {
       setError(apiError(err, 'Registration failed.'));
     } finally {
@@ -89,8 +83,12 @@ export function AuthLanding({ onAuthed }: Props) {
   };
 
   const continueGuest = async () => {
-    await continueAsGuest();
-    onAuthed();
+    setLoading(true);
+    try {
+      await continueAsGuest();
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
